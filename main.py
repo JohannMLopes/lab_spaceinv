@@ -35,7 +35,41 @@ def dificult(diff):
         dificil.draw()
         janela.update()
 
-def game():
+def spaceinv():
+
+    janela = Window(800, 600)
+    teclado = janela.get_keyboard()
+    nave = Sprite("game/spc_ship")
+    tiro = Sprite("game/laser")
+
+    # Inicia objetos
+
+    nave.x = janela.width/2 - nave.width/2
+    nave.y = janela.height - nave.height - 10
+
+    while(True):
+
+        if teclado.key_pressed("esc"):
+            main()
+
+        # Colisão
+        if nave.x <= 0:
+            nave.x = 0
+        if nave.x >= janela.width - nave.width:
+            nave.x = janela.width - nave.width
+
+        # Movimento da nave
+        if teclado.key_pressed("left"):
+            nave.x -= 100
+        if teclado.key_pressed("right"):
+            nave.x += 100
+
+        janela.set_background_color([0, 0, 0])
+        nave.draw()
+        janela.update()
+
+def main():
+
     janela = Window(800, 600)
     janela.set_title("Game")
     teclado = janela.get_keyboard()
@@ -75,6 +109,9 @@ while True:
 
     if mouse.is_over_area([diff.x, diff.y], [diff.x + diff.width, diff.y + diff.height]) and mouse.is_button_pressed(1):
         dificuldade = dificult(dificuldade)
+
+    if mouse.is_over_area([play.x, play.y], [play.x + play.width, play.y + play.height]) and mouse.is_button_pressed(1):
+        spaceinv()
 
     janela.set_background_color([255, 255, 255])
     play.draw()
