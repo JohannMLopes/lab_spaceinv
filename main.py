@@ -40,7 +40,7 @@ def spaceinv():
     janela = Window(800, 600)
     teclado = janela.get_keyboard()
     nave = Sprite("game/spc_ship.png")
-    tiro = Sprite("game/laser.png")
+    tiro = False
 
     # Inicia objetos
 
@@ -58,12 +58,25 @@ def spaceinv():
         if nave.x >= janela.width - nave.width:
             nave.x = janela.width - nave.width
 
+        # Tiro
+        if teclado.key_pressed("space"):
+            tiro = Sprite("game/laser.png")
+            tiro.y = nave.y - tiro.height
+            tiro.x = nave.x + nave.width/2 - tiro.width/2
+
+        if tiro == True:
+            if tiro.y < 0-tiro.height:
+                tiro = False
+            tiro.x += 200 * janela.delta_time()
+
         # Movimento da nave
         if teclado.key_pressed("left"):
             nave.x -= 100 * janela.delta_time()
         if teclado.key_pressed("right"):
             nave.x += 100 * janela.delta_time()
 
+        if tiro == True:
+            tiro.draw()
         janela.set_background_color([0, 0, 0])
         nave.draw()
         janela.update()
