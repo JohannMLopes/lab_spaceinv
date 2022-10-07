@@ -39,18 +39,18 @@ def spaceinv():
 
     janela = Window(800, 600)
     teclado = janela.get_keyboard()
-    nave = Sprite("game/spc_ship")
-    tiro = Sprite("game/laser")
+    nave = Sprite("game/spc_ship.png")
+    tiro = Sprite("game/laser.png")
 
     # Inicia objetos
 
     nave.x = janela.width/2 - nave.width/2
     nave.y = janela.height - nave.height - 10
 
-    while(True):
+    while True:
 
         if teclado.key_pressed("esc"):
-            main()
+            break
 
         # Colisão
         if nave.x <= 0:
@@ -60,23 +60,19 @@ def spaceinv():
 
         # Movimento da nave
         if teclado.key_pressed("left"):
-            nave.x -= 100
+            nave.x -= 100 * janela.delta_time()
         if teclado.key_pressed("right"):
-            nave.x += 100
+            nave.x += 100 * janela.delta_time()
 
         janela.set_background_color([0, 0, 0])
         nave.draw()
         janela.update()
 
-def main():
+#MAIN
 
-    janela = Window(800, 600)
-    janela.set_title("Game")
-    teclado = janela.get_keyboard()
-
-    while True:
-        janela.set_background_color([0, 0, 0])
-        janela.update()
+janela = Window(800, 600)
+janela.set_title("Game")
+teclado = janela.get_keyboard()
 
 # INICIA RECURSOS
 janela = Window(800, 600)
@@ -112,6 +108,9 @@ while True:
 
     if mouse.is_over_area([play.x, play.y], [play.x + play.width, play.y + play.height]) and mouse.is_button_pressed(1):
         spaceinv()
+
+    if mouse.is_over_area([sair.x, sair.y], [sair.x + sair.width, sair.y + sair.height]) and mouse.is_button_pressed(1):
+        break
 
     janela.set_background_color([255, 255, 255])
     play.draw()
