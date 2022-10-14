@@ -1,7 +1,7 @@
 from PPlay.window import *
 from PPlay.sprite import *
 
-def dificult(diff):
+def dificult():
 
     janela = Window(800, 600)
     mouse = janela.get_mouse()
@@ -24,10 +24,10 @@ def dificult(diff):
             diff = 1
             return diff
         if mouse.is_over_area([medio.x, medio.y],[medio.x + medio.width, medio.y + medio.height]) and mouse.is_button_pressed(1):
-            diff = 2
+            diff = 1.5
             return diff
         if mouse.is_over_area([dificil.x, dificil.y],[dificil.x + dificil.width, dificil.y + dificil.height]) and mouse.is_button_pressed(1):
-            diff = 3
+            diff = 2
             return diff
         janela.set_background_color([255, 255, 255])
         facil.draw()
@@ -35,19 +35,41 @@ def dificult(diff):
         dificil.draw()
         janela.update()
 
-def spaceinv():
+def spaceinv(dificuldade):
 
     janela = Window(800, 600)
     teclado = janela.get_keyboard()
     nave = Sprite("game/spc_ship.png")
-    tiro = False
+    vtiro = []
+    venemy = []
+    menemy = []
+    tcont = 1.0
+    ct = 0.0
+    fps = 0
+    cfps = 0
 
     # Inicia objetos
 
     nave.x = janela.width/2 - nave.width/2
     nave.y = janela.height - nave.height - 10
 
+    for i in range(0, 3):
+        for j in range(0,4):
+            enemy = Sprite("game/enemy.png")
+            enemy.x = 10 + (enemy.width * j)
+            enemy.y = 10 + (enemy.height * i)
+            venemy.append(enemy)
+        menemy.append(venemy)
+
     while True:
+
+        tcont += janela.delta_time()
+        ct += janela.delta_time()
+        fps += 1
+        if ct > 1.0:
+            cfps = fps
+            fps = 0
+            ct = 0.0
 
         if teclado.key_pressed("esc"):
             break
@@ -59,15 +81,21 @@ def spaceinv():
             nave.x = janela.width - nave.width
 
         # Tiro
-        if teclado.key_pressed("space"):
+        if teclado.key_pressed("space") and tcont > 1.0 * dificuldade:
             tiro = Sprite("game/laser.png")
             tiro.y = nave.y - tiro.height
             tiro.x = nave.x + nave.width/2 - tiro.width/2
+            vtiro.append(tiro)
+            tcont = 0.0
 
-        if tiro == True:
-            if tiro.y < 0-tiro.height:
-                tiro = False
-            tiro.x += 200 * janela.delta_time()
+        for i in range(len(vtiro)):
+            if vtiro[i].y < 0 - tiro.height:
+                vtiro.pop(i)
+                break
+
+        for i in range(len(vtiro)):
+            vtiro[i].y -= 100 * janela.delta_time()
+
 
         # Movimento da nave
         if teclado.key_pressed("left"):
@@ -75,10 +103,14 @@ def spaceinv():
         if teclado.key_pressed("right"):
             nave.x += 100 * janela.delta_time()
 
-        if tiro == True:
-            tiro.draw()
         janela.set_background_color([0, 0, 0])
         nave.draw()
+        for i in range(len(vtiro)):
+            vtiro[i].draw()
+        for i in range(len(menemy)):
+            for j in range(len(venemy)):
+                venemy[j].draw()
+        janela.draw_text("%d" % cfps, janela.width - 30, 10, 12, [255, 255, 255], "Arial", False, False)
         janela.update()
 
 #MAIN
@@ -117,10 +149,10 @@ dificuldade = 1
 while True:
 
     if mouse.is_over_area([diff.x, diff.y], [diff.x + diff.width, diff.y + diff.height]) and mouse.is_button_pressed(1):
-        dificuldade = dificult(dificuldade)
+        dificuldade = dificult()
 
     if mouse.is_over_area([play.x, play.y], [play.x + play.width, play.y + play.height]) and mouse.is_button_pressed(1):
-        spaceinv()
+        spaceinv(dificuldade)
 
     if mouse.is_over_area([sair.x, sair.y], [sair.x + sair.width, sair.y + sair.height]) and mouse.is_button_pressed(1):
         break
@@ -130,5 +162,5 @@ while True:
     diff.draw()
     ranking.draw()
     sair.draw()
-    janela.draw_text("%d" % dificuldade,400, 50, 24, [0, 0, 0], "Arial", False, False)
+    janela.draw_text("%.1f" % dificuldade, 400, 50, 24, [0, 0, 0], "Arial", False, False)
     janela.update()
