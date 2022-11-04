@@ -43,6 +43,7 @@ def spaceinv(dificuldade):
     vtiro = []
     venemy = []
     menemy = []
+    velenemy = 100
     tcont = 1.0
     ct = 0.0
     fps = 0
@@ -60,6 +61,8 @@ def spaceinv(dificuldade):
             enemy.y = 10 + (enemy.height * i)
             venemy.append(enemy)
         menemy.append(venemy)
+
+    # GameLoop
 
     while True:
 
@@ -103,6 +106,25 @@ def spaceinv(dificuldade):
         if teclado.key_pressed("right"):
             nave.x += 100 * janela.delta_time()
 
+        # Inimigos
+
+        for i in range(len(menemy)):
+            for j in range(len(venemy)):
+                if venemy[j].x > janela.width - enemy.width:
+                    velenemy = -velenemy
+                    venemy[j].x = janela.width - enemy.width
+                    for k in range(len(venemy)):
+                        venemy[k].y += 10
+                elif venemy[j].x < 0:
+                    velenemy = -velenemy
+                    venemy[j].x = 0
+                    for k in range(len(venemy)):
+                        venemy[k].y += 10
+                elif venemy[j].y >= nave.y - enemy.height:
+                    return 0
+                venemy[j].x += velenemy * janela.delta_time()
+            
+        
         janela.set_background_color([0, 0, 0])
         nave.draw()
         for i in range(len(vtiro)):
