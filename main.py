@@ -43,7 +43,7 @@ def spaceinv(dificuldade):
     vtiro = []
     venemy = []
     menemy = []
-    velenemy = 100
+    velenemy = 50
     tcont = 1.0
     ct = 0.0
     fps = 0
@@ -66,6 +66,7 @@ def spaceinv(dificuldade):
 
     while True:
 
+        hit = False
         tcont += janela.delta_time()
         ct += janela.delta_time()
         fps += 1
@@ -99,6 +100,21 @@ def spaceinv(dificuldade):
         for i in range(len(vtiro)):
             vtiro[i].y -= 100 * janela.delta_time()
 
+        for i in range(len(vtiro)):
+            if vtiro[i].y <= venemy[-1].y + enemy.height:
+                for j in range(len(menemy)):
+                    for k in range(len(venemy)):
+                        if vtiro[i].collided(venemy[k]):
+                            hit = True
+                            venemy.pop(k)
+                            vtiro.pop(i)
+                            break
+                    if hit:
+                        break
+            if hit:
+                break            
+
+
 
         # Movimento da nave
         if teclado.key_pressed("left"):
@@ -114,14 +130,14 @@ def spaceinv(dificuldade):
                     velenemy = -velenemy
                     venemy[j].x = janela.width - enemy.width
                     for k in range(len(venemy)):
-                        venemy[k].y += 10
-                elif venemy[j].x < 0:
+                        venemy[k].y += 500 * janela.delta_time()
+                if venemy[j].x < 0:
                     velenemy = -velenemy
                     venemy[j].x = 0
                     for k in range(len(venemy)):
-                        venemy[k].y += 10
-                elif venemy[j].y >= nave.y - enemy.height:
-                    return 0
+                        venemy[k].y += 500 * janela.delta_time()
+                if venemy[j].y >= nave.y - enemy.height:
+                    return
                 venemy[j].x += velenemy * janela.delta_time()
             
         
