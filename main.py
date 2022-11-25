@@ -48,6 +48,7 @@ def spaceinv(dificuldade):
     ct = 0.0
     fps = 0
     cfps = 0
+    points = 0
 
     # Inicia objetos
 
@@ -98,7 +99,7 @@ def spaceinv(dificuldade):
                 break
 
         for i in range(len(vtiro)):
-            vtiro[i].y -= 100 * janela.delta_time()
+            vtiro[i].y -= 500 * janela.delta_time()
 
         for i in range(len(vtiro)):
             if vtiro[i].y <= venemy[-1].y + enemy.height:
@@ -106,13 +107,26 @@ def spaceinv(dificuldade):
                     for k in range(len(venemy)):
                         if vtiro[i].collided(venemy[k]):
                             hit = True
+                            points += 10 * dificuldade
                             venemy.pop(k)
                             vtiro.pop(i)
                             break
                     if hit:
                         break
             if hit:
-                break            
+                break
+
+        if menemy == [[], [], []]:
+            for i in range(len(vtiro)):
+                vtiro.pop(0)         
+            for i in range(0, 3):
+                for j in range(0,4):
+                    enemy = Sprite("game/enemy.png")
+                    enemy.x = 10 + (enemy.width * j)
+                    enemy.y = 10 + (enemy.height * i)
+                    venemy.append(enemy)
+                menemy[i] = venemy
+            dificuldade = dificuldade + 0.5
 
 
 
@@ -124,21 +138,26 @@ def spaceinv(dificuldade):
 
         # Inimigos
 
-        for i in range(len(menemy)):
-            for j in range(len(venemy)):
-                if venemy[j].x > janela.width - enemy.width:
-                    velenemy = -velenemy
-                    venemy[j].x = janela.width - enemy.width
-                    for k in range(len(venemy)):
-                        venemy[k].y += 500 * janela.delta_time()
-                if venemy[j].x < 0:
-                    velenemy = -velenemy
-                    venemy[j].x = 0
-                    for k in range(len(venemy)):
-                        venemy[k].y += 500 * janela.delta_time()
-                if venemy[j].y >= nave.y - enemy.height:
-                    return
-                venemy[j].x += velenemy * janela.delta_time()
+        if menemy != [[], [], []]:
+            for i in range(len(menemy)):
+                for j in range(len(venemy)):
+                    if venemy[j].x > janela.width - enemy.width:
+                        for k in range(len(venemy)):
+                            venemy[k].y += 5000 * janela.delta_time()
+                        velenemy = -50 * dificuldade
+                        venemy[j].x = janela.width - enemy.width
+                    if venemy[j].x < 0:
+                        for k in range(len(venemy)):
+                            venemy[k].y += 5000 * janela.delta_time()
+                        velenemy = 50 * dificuldade
+                        venemy[j].x = 0
+                    if venemy[j].y >= nave.y - enemy.height:
+                        janela.draw_text("YOU LOST", 400, 50, 72, [255, 255, 255], "Arial", True, False)
+                        name = input("Write your name: ")
+                        points = str(points)
+                        rank.write(name + " " + points + "\n")
+                        return
+                    venemy[j].x += velenemy * janela.delta_time()
             
         
         janela.set_background_color([0, 0, 0])
@@ -148,6 +167,7 @@ def spaceinv(dificuldade):
         for i in range(len(menemy)):
             for j in range(len(venemy)):
                 venemy[j].draw()
+        janela.draw_text("Pontos: %d" % points,             30, 10, 12, [255, 255, 255], "Arial", False, False)
         janela.draw_text("%d" % cfps, janela.width - 30, 10, 12, [255, 255, 255], "Arial", False, False)
         janela.update()
 
@@ -162,6 +182,8 @@ janela = Window(800, 600)
 janela.set_title("SpaceInv")
 
 mouse = janela.get_mouse()
+
+rank = open("rank.txt", "a")
 
 # INICIA OPÇOES MENU
 play = Sprite("menu/play.png")
