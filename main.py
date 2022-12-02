@@ -1,5 +1,6 @@
 from PPlay.window import *
 from PPlay.sprite import *
+import random
 
 def dificult():
 
@@ -49,6 +50,9 @@ def spaceinv(dificuldade):
     fps = 0
     cfps = 0
     points = 0
+    boss_set = False
+    boss_life = 3
+    random.seed(5)
 
     # Inicia objetos
 
@@ -57,10 +61,23 @@ def spaceinv(dificuldade):
 
     for i in range(0, 3):
         for j in range(0,4):
-            enemy = Sprite("game/enemy.png")
-            enemy.x = 10 + (enemy.width * j)
-            enemy.y = 10 + (enemy.height * i)
-            venemy.append(enemy)
+            if random.randint(0, 1) == 1 and boss_set == False:
+                boss = Sprite("game/boss.png")
+                boss.x = 10 + (boss.width * j)
+                boss.y = 10 + (boss.height * i)
+                venemy.append(boss)
+                boss_set = True
+            elif i == 2 and j == 3 and boss_set == False:
+                boss = Sprite("game/boss.png")
+                boss.x = 10 + (boss.width * j)
+                boss.y = 10 + (boss.height * i)
+                venemy.append(boss)
+                boss_set = True
+            else:
+                enemy = Sprite("game/enemy.png")
+                enemy.x = 10 + (enemy.width * j)
+                enemy.y = 10 + (enemy.height * i)
+                venemy.append(enemy)
         menemy.append(venemy)
 
     # GameLoop
@@ -101,36 +118,69 @@ def spaceinv(dificuldade):
         for i in range(len(vtiro)):
             vtiro[i].y -= 500 * janela.delta_time()
 
+        # Hit
+
         for i in range(len(vtiro)):
             if vtiro[i].y <= venemy[-1].y + enemy.height:
                 for j in range(len(menemy)):
                     for k in range(len(venemy)):
                         if vtiro[i].collided(venemy[k]):
-                            hit = True
-                            points += 10 * dificuldade
-                            venemy.pop(k)
-                            vtiro.pop(i)
-                            break
+                            if venemy[k] == boss:
+                                if boss_life == 2:
+                                    hit = True
+                                    boss = enemy
+                                    boss_life -= 1
+                                    vtiro.pop(i)
+                                    break
+                                else:
+                                    hit = True                                    
+                                    boss_life -= 1
+                                    vtiro.pop(i)
+                                    break
+                            else:
+                                hit = True
+                                points += 10 * dificuldade
+                                venemy.pop(k)
+                                vtiro.pop(i)
+                                break
                     if hit:
                         break
             if hit:
                 break
 
+        # Reset/New phase
+
         if menemy == [[], [], []]:
+            boss_set = False
+            boss_life = 3
             for i in range(len(vtiro)):
                 vtiro.pop(0)         
             for i in range(0, 3):
                 for j in range(0,4):
-                    enemy = Sprite("game/enemy.png")
-                    enemy.x = 10 + (enemy.width * j)
-                    enemy.y = 10 + (enemy.height * i)
-                    venemy.append(enemy)
+                    if random.randint(0, 1) == 1 and boss_set == False:
+                        enemy = Sprite("game/boss.png")
+                        enemy.x = 10 + (enemy.width * j)
+                        enemy.y = 10 + (enemy.height * i)
+                        venemy.append(enemy)
+                        boss_set = True
+                    elif i == 2 and j == 3 and boss_set == False:
+                        enemy = Sprite("game/boss.png")
+                        enemy.x = 10 + (enemy.width * j)
+                        enemy.y = 10 + (enemy.height * i)
+                        venemy.append(enemy)
+                        boss_set = True
+                    else:
+                        enemy = Sprite("game/enemy.png")
+                        enemy.x = 10 + (enemy.width * j)
+                        enemy.y = 10 + (enemy.height * i)
+                        venemy.append(enemy)
                 menemy[i] = venemy
             dificuldade = dificuldade + 0.5
 
 
 
         # Movimento da nave
+
         if teclado.key_pressed("left"):
             nave.x -= 100 * janela.delta_time()
         if teclado.key_pressed("right"):
@@ -144,12 +194,12 @@ def spaceinv(dificuldade):
                     if venemy[j].x > janela.width - enemy.width:
                         for k in range(len(venemy)):
                             venemy[k].y += 5000 * janela.delta_time()
-                        velenemy = -50 * dificuldade
+                        velenemy = -50
                         venemy[j].x = janela.width - enemy.width
                     if venemy[j].x < 0:
                         for k in range(len(venemy)):
                             venemy[k].y += 5000 * janela.delta_time()
-                        velenemy = 50 * dificuldade
+                        velenemy = 50
                         venemy[j].x = 0
                     if venemy[j].y >= nave.y - enemy.height:
                         janela.draw_text("YOU LOST", 400, 50, 72, [255, 255, 255], "Arial", True, False)
